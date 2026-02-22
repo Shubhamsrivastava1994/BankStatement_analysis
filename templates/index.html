@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro-Underwrite AI | Dashboard</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/lucide.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --success: #10b981;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 260px;
+            background: rgba(0, 0, 0, 0.2);
+            border-right: 1px solid var(--glass-border);
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 50px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #fff;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: var(--text-dim);
+            text-decoration: none;
+            margin-bottom: 8px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .nav-item.active {
+            background: var(--glass);
+            color: white;
+            border: 1px solid var(--glass-border);
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header { margin-bottom: 40px; }
+        .header h1 { font-size: 32px; margin-bottom: 8px; }
+        .header p { color: var(--text-dim); }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 30px;
+        }
+
+        /* --- Cards --- */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+        /* --- Advanced Upload Area --- */
+        .upload-zone {
+            border: 2px dashed var(--glass-border);
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .upload-zone.file-selected {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .upload-zone i {
+            width: 48px;
+            height: 48px;
+            color: var(--primary);
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+
+        .upload-zone.file-selected i {
+            color: var(--success);
+        }
+
+        #file-name-display {
+            display: block;
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--text-dim);
+            word-break: break-all;
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { 
+            background: var(--primary-hover); 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-secondary { background: transparent; border: 1px solid var(--glass-border); color: white; }
+        .btn-secondary:hover { background: rgba(255,255,255,0.05); }
+
+        /* --- Status Badges --- */
+        .badge {
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        .badge-approve { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #059669; }
+        .badge-reject { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #dc2626; }
+        .badge-pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #d97706; }
+
+        #result-box {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            min-height: 200px;
+            font-size: 15px;
+            line-height: 1.7;
+            color: #cbd5e1;
+            white-space: pre-wrap;
+        }
+
+        /* --- Loader --- */
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        @media (max-width: 950px) {
+            .grid-layout { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">
+            <div style="background: var(--primary); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="shield-check" style="width: 18px; color: white;"></i>
+            </div>
+            <span>ProUnderwrite</span>
+        </div>
+        <nav>
+            <a href="#" class="nav-item active"><i data-lucide="layout-dashboard" style="width: 18px;"></i> Dashboard</a>
+            <a href="#" class="nav-item"><i data-lucide="layers" style="width: 18px;"></i> Batch Process</a>
+            <a href="#" class="nav-item"><i data-lucide="history" style="width: 18px;"></i> Audit Logs</a>
+            <a href="#" class="nav-item"><i data-lucide="settings" style="width: 18px;"></i> Configuration</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>AI Underwriting</h1>
+            <p>Deploying neural models to assess financial creditworthiness.</p>
+        </header>
+
+        <div class="grid-layout">
+            <div class="glass-card">
+                <h3 style="font-size: 18px; margin-bottom: 20px;">Upload Statement</h3>
+                
+                <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file').click()">
+                    <i data-lucide="upload-cloud" id="upload-icon"></i>
+                    <p id="upload-main-text" style="font-weight: 500;">Select Bank Statement</p>
+                    <span id="file-name-display">Drag and drop PDF here</span>
+                    <input type="file" id="file" hidden onchange="handleFileSelect()">
+                </div>
+
+                <button class="btn btn-primary" onclick="upload()">
+                    <i data-lucide="arrow-up-circle" style="width: 18px;"></i> Upload to Server
+                </button>
+
+                <div style="margin: 25px 0; border-top: 1px solid var(--glass-border);"></div>
+
+                <button class="btn btn-secondary" onclick="analysis()">
+                    <i data-lucide="zap" style="width: 18px; color: #fbbf24;"></i> Run AI Analysis
+                </button>
+                <button class="btn btn-secondary" onclick="download()">
+                    <i data-lucide="download" style="width: 18px;"></i> Download Excel
+                </button>
+
+                <div class="loader" id="loader">
+                    <div class="spinner"></div>
+                    <p style="font-size: 13px; color: var(--primary);">Analyzing Financial Data...</p>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="font-size: 18px;">System Decision</h3>
+                    <div id="badge-slot"></div>
+                </div>
+
+                <div id="result-box">
+                    Awaiting document upload. Please provide a bank statement in PDF format to begin the automated risk assessment.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Handle File Selection UI Change
+        function handleFileSelect() {
+            const input = document.getElementById('file');
+            const zone = document.getElementById('drop-zone');
+            const mainText = document.getElementById('upload-main-text');
+            const subText = document.getElementById('file-name-display');
+            const icon = document.getElementById('upload-icon');
+
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                zone.classList.add('file-selected');
+                mainText.innerText = "File Ready";
+                mainText.style.color = "var(--success)";
+                subText.innerHTML = `<strong>${file.name}</strong><br>${(file.size/1024).toFixed(1)} KB`;
+                
+                // Change Icon to Check
+                icon.setAttribute('data-lucide', 'check-circle-2');
+                lucide.createIcons();
+            }
+        }
+
+        // Logic Functions
+        function upload() {
+            const fileInput = document.getElementById("file");
+            if(!fileInput.files[0]) return alert("Please select a file first!");
+            
+            let formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            fetch("/upload", { method: "POST", body: formData })
+                .then(res => res.json())
+                .then(() => alert("Upload Successful ✅"));
+        }
+
+        function download() {
+            window.location = "/download";
+        }
+
+        function analysis() {
+            const loader = document.getElementById("loader");
+            const resultBox = document.getElementById("result-box");
+            
+            loader.style.display = "block";
+            resultBox.style.opacity = "0.4";
+
+            fetch("/analysis")
+                .then(res => res.json())
+                .then(data => {
+                    loader.style.display = "none";
+                    resultBox.style.opacity = "1";
+
+                    let text = data.analysis;
+                    resultBox.innerText = text;
+
+                    let badgeSlot = document.getElementById("badge-slot");
+                    
+                    if (text.includes("APPROVE")) {
+                        badgeSlot.innerHTML = '<span class="badge badge-approve">Approved</span>';
+                    } else if (text.includes("REJECT")) {
+                        badgeSlot.innerHTML = '<span class="badge badge-reject">Rejected</span>';
+                    } else {
+                        badgeSlot.innerHTML = '<span class="badge badge-pending">Review Required</span>';
+                    }
+                })
+                .catch(err => {
+                    loader.style.display = "none";
+                    alert("Analysis failed. Please try again.");
+                });
+        }
+    </script>
+    <script src="https://chat-bot-c70y.onrender.com/chatbot.js"></script>
+</body>
+</html>
+
